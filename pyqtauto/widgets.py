@@ -77,9 +77,15 @@ class ExceptionMessageBox(OrphanMessageBox):
 	"""
 
 	def __init__(self, exception, icon='warning'):
-		msg = (exception.message 
-		if len(exception.message) > 1 
-		else str(exception))
+                if len(exception.message) > 1:
+                        msg = exception.message
+                else:
+                        msg = str(exception)
+
+                try:
+                        icon = exception.icon
+                except AttributeError:
+                        pass
 		super(ExceptionMessageBox, self).__init__(
 			type(exception).__name__,
 			[msg],
@@ -340,7 +346,7 @@ class MenuBar(object):
 
 		Returns
 		-------
-		menu : Menu
+		menu : QMenu
 		"""
 		menu = self.menubar.addMenu(name)
 		return menu
@@ -350,7 +356,7 @@ class MenuBar(object):
 
  		Parameters
  		----------
- 		menu : Menu
+ 		menu : QMenu
  			Receiver of this action.
  		img : str
 			Absolute path to action icon.
