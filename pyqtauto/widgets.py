@@ -157,6 +157,7 @@ class ImageButton(GenericButton):
 	response : func or None, optional
 	tooltip : str, optional
 	enabled : {True, False}, optional
+	flat : bool, optional
 	"""
 
 	def __init__(
@@ -165,12 +166,14 @@ class ImageButton(GenericButton):
 		parent=None,
 		response=None,
 		tooltip=str(),
-		enabled=True):
+		enabled=True,
+                flat=False):
 		super(ImageButton, self).__init__(None, parent, response)
 		img = QtGui.QIcon(QtGui.QPixmap(img))
 		self.setIcon(img)
 		self.setToolTip(tooltip)
 		self.setEnabled(enabled)
+		self.setFlat(flat)
 		self._mysquare = False
 		self._mywidth = self.width()
 		self._myheight = self.height()
@@ -428,23 +431,21 @@ class Workspace(QtGui.QGroupBox):
 	layout_type : {'QVBoxLayout', 'QHBoxLayout', 'QFormLayout', 'QGridLayout'}, 
 		optional
 	spacing : int, optional
+	flat : bool, optional
 	"""
 
 	def __init__(
-			self,
-			parent,
-			title,
-			max_height,
-			layout_type='QVBoxLayout', spacing=10):
+                self, parent, title, max_height, layout_type='QVBoxLayout',
+                spacing=10, flat=True
+                ):
 		super(Workspace, self).__init__()
 		self.setTitle(title)
 		self.setMaximumHeight(max_height)
-		self.setFlat(True)
+		self.setFlat(flat)
 		self.setCheckable(True)
 		self.layout = setters.set_layout(self, layout_type)
 		self.layout.setSpacing(spacing)
 		self.toggled.connect(self._toggle)
-		#parent.addWidget(self)
 		setters.set_parent(self, parent)
 
 	def _toggle(self):
@@ -463,7 +464,6 @@ class Workspace(QtGui.QGroupBox):
 		for i in range(self.layout.count()):
 			try:
 				self.layout.itemAt(i).widget().hide()
-				self.layout.hide()
 			except AttributeError:
 				pass
 
@@ -530,22 +530,23 @@ class Spacer(QtGui.QSpacerItem):
 class Table(QtGui.QTableWidget):
 	"""Standardized QTableWidget.
 
-	Attributes
+	Parameters
 	----------
 	headers : list[str]
 		Horizontal header items.
-
-	Parameters
-	----------
 	widths : list[int] or None, optional
 		A list of corresponding horizontal header item widths. An input of None
 		equates to a list of zeros of size len(`headers`).
-		"""
 
+	Attributes
+	----------
+	headers
+
+	"""
 	def __init__(self, headers, widths=None):
-		super(Table, self).__init__()
 		self.headers = headers
 		self._widths = widths
+		super(Table, self).__init__()
 		self.setColumnCount(len(self.headers))
 		self.setHorizontalHeaderLabels(self.headers)
 		self.horizontalHeader().setStretchLastSection(True)
@@ -553,10 +554,12 @@ class Table(QtGui.QTableWidget):
 		self._set_header_widths()
 
 	def _validate_widths(self):
+		"""Define header widths if input is ``None``."""
 		if self._widths == None:
 			self._widths = [0]*len(self.headers)
 
 	def _set_header_widths(self):
+		"""Assign horizontal header widths."""
 		for i in range(self.columnCount()):
 			if self._widths[i] == 0:
 				self.horizontalHeader().setResizeMode(
@@ -567,6 +570,63 @@ class Table(QtGui.QTableWidget):
 				self.horizontalHeader().setResizeMode(
 					i,
 					QtGui.QHeaderView.Fixed)
+
+
+class Calendar(QtGui.QCalendarWidget):
+	"""Standardized QCalendarWidget.
+
+	Parameters
+	----------
+	parent : QLayout subclass, optional
+
+	"""
+	def __init__(self, parent=None):
+		super(Calendar, self).__init__()
+		setters.set_parent(self, parent)
+
+	@property
+	def date(self):
+		"""str: The selected date."""
+		return str(self.selectedDate().toString('MM/dd/yyyy'))
+
+
+class StatusBar(QtGui.QStatusBar):
+	"""Standardized QStatusBar.
+
+	Parameters
+	----------
+	parent : QMainWindow
+
+	"""
+	# The length of time status messages are shown in milliseconds.
+	# 2000 = 2 seconds
+	_DURATION = 2000
+
+	def __init__(self, parent):
+		self._parent = parent
+		super(StatusBar, self).__init__()
+		self._parent.setStatusBar(self)
+
+	def show_login_msg(self, user):
+		"""Message displayed immediately after user login.
+
+		Parameters
+		----------
+		user : str
+
+		"""
+		self.showMessage('Logged in as %s' % user, self._DURATION)
+	
+	def show_save_msg(self, data):
+		"""Message displayed immediately after save.
+
+		Parameters
+		----------
+		data : str
+			A name describing the information that was saved.
+
+		"""
+		self.showMessage('%s saved successfully' % data, self._DURATION)
 
 
 if __name__ == '__main__':
