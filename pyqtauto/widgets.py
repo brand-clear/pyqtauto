@@ -93,6 +93,18 @@ class ExceptionMessageBox(OrphanMessageBox):
 			)
 
 
+class Ask(OrphanMessageBox):
+	def __init__(self, title, message):
+		super(Ask, self).__init__(
+			title, message, icon='warning', buttons='yesno'
+		)
+	
+	def yes(self):
+		if self.exec_() == QtGui.QMessageBox.Yes:
+			return True
+
+
+
 class DialogButtonBox(QtGui.QDialogButtonBox):
 	"""Standardized QDialogButtonBox.
 	
