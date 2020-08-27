@@ -389,7 +389,7 @@ class MenuBar(object):
 		menu = self.menubar.addMenu(name)
 		return menu
 
- 	def add_action(self, menu, img, name, shortcut=None, response=None):
+	def add_action(self, menu, img, name, shortcut=None, response=None):
  		"""Add action to menu.
 
  		Parameters
@@ -479,7 +479,7 @@ class Workspace(QtGui.QGroupBox):
 	"""
 
 	def __init__(self, parent, title, max_height, layout_type='QVBoxLayout',
-                spacing=10, flat=True):
+				spacing=10, flat=True):
 		super(Workspace, self).__init__()
 		self.setTitle(title)
 		self.setMaximumHeight(max_height)
