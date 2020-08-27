@@ -1,2 +1,2 @@
 # pyqtauto
-Simplified implementations of commonly used PyQt4 objects.
+pyqtauto is a PyQt4 wrapper that simplifies the implementation of commonly used PyQt4 objects. 
